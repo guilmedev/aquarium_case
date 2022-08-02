@@ -69,6 +69,8 @@ public class Aquarium : MonoBehaviour
     // Learping values
     float currentHitPosition;
     bool lerping;
+    bool commandSent = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -101,14 +103,26 @@ public class Aquarium : MonoBehaviour
 
         GameObject currentHit = Instantiate(_myhitPrefab, hit.point, Quaternion.LookRotation(hit.normal));
 
+        //Maybe add as HitPoint ?
         hits.Add(currentHit);
         currentHit.transform.SetParent(this.transform);
 
-        //Where hitted ?
+        var hitPoint = currentHit.GetComponent<HitPoint>();
+        if (hitPoint != null)
+        {
+            //Where hitted ?
+            if (HittedInsideWatter(currentHit))
+            {
+                hitPoint.Init();
+                //TODO Coroutine Queue 
+                StartCoroutine(LerpTo(currentHit));
+            }
+        }
+    }
 
-        //TODO Coroutine Queue
-        StartCoroutine(LerpTo(currentHit));
-
+    private bool HittedInsideWatter(GameObject currentHit)
+    {
+        return target.position.y > currentHit.transform.position.y;
     }
 
     IEnumerator LerpTo(GameObject hitPoint)
@@ -118,7 +132,7 @@ public class Aquarium : MonoBehaviour
         float startValue = target.transform.position.y;
         float endValue = (hitPoint.transform.position.y) + HIT_POS_OFFSET;
 
-        commandSend = false;
+        commandSent = false;
 
         while (timeElapsed < _timeToBeEmpty)
         {
@@ -141,38 +155,12 @@ public class Aquarium : MonoBehaviour
         target.transform.position = new Vector3(target.transform.position.x, endValue, target.transform.position.z);
     }
 
-    IEnumerator LerpEmissionValue(ParticleSystem particle, float endValue, float durartion)
-    {
-        float timeElapsed = 0;
-        float lerpValue = 0;
-        float initalValue = particle.emission.rateOverTime.constant;
-
-        ParticleSystem.EmissionModule emissionModule = particle.emission;
-
-        while (timeElapsed < durartion)
-        {
-            lerpValue = Mathf.Lerp(initalValue, endValue, timeElapsed / durartion);
-
-            emissionModule.rateOverTime = lerpValue;
-
-            timeElapsed += Time.deltaTime;
-
-            yield return null;
-        }
-
-        emissionModule.rateOverTime = endValue;
-
-    }
-
-    bool commandSend = false;
     private void ReduceWatter(GameObject hit)
     {
-        if (commandSend) return;
-        Debug.Log("Piiiiu...");
-        var particle = hit.GetComponentInChildren<ParticleSystem>();
-
-        StartCoroutine(LerpEmissionValue(particle, 0, .48f));
-        commandSend = true;
+        if (commandSent) return;
+        HitPoint hitPoint = hit.GetComponentInChildren<HitPoint>();
+        hitPoint.ReduceWatter(0, .48f);
+        commandSent = true;
 
     }
 }
