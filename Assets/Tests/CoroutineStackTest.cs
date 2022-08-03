@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CoroutineStackTest : MonoBehaviour
 {
@@ -27,6 +28,11 @@ public class CoroutineStackTest : MonoBehaviour
     private int currentHit;
 
     IEnumerator runningCoroutine = null;
+
+
+    [Header("UI")]
+    [SerializeField]
+    private Slider slider;
 
     // Start is called before the first frame update
     void Start()
@@ -90,9 +96,16 @@ public class CoroutineStackTest : MonoBehaviour
     IEnumerator LerpFunction(GameObject hitPoint)
     {
         float timeElapsed = 0;
+        float clampedTimeElapsed = 0;
         Vector3 lerpValue;
         Vector3 startValue = moveble.transform.position;
         Vector3 endValue = (hitPoint.transform.position);
+
+        if (slider != null)
+        {
+            slider.maxValue = 3f;
+
+        }
 
         while (timeElapsed < 3f)
         {
@@ -102,13 +115,19 @@ public class CoroutineStackTest : MonoBehaviour
 
             timeElapsed += Time.deltaTime;
 
-            //if (hitPoint != null)
-            //Debug.Log("Moving ... to : " + hitPoint?.gameObject?.name);
+
+
+            if (slider != null)
+            {
+                slider.value = timeElapsed;
+            }
+            //Debug.Log(clampedTimeElapsed);
 
             yield return null;
         }
 
         moveble.transform.position = endValue;
     }
+
     #endregion
 }
