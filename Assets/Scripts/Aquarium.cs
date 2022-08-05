@@ -84,6 +84,12 @@ public class Aquarium : MonoBehaviour
 
     private bool isBroken;
 
+    [Header("Sound")]
+    [SerializeField]
+    private AudioSource _brokenAudioSource;
+    [SerializeField]
+    private AudioClip _clip;
+
 
     // Start is called before the first frame update
     void Start()
@@ -94,6 +100,8 @@ public class Aquarium : MonoBehaviour
         isBroken = false;
         _currentLife = _life;
         _currentTimeToBeEmpty = _timeToBeEmpty;
+
+        _brokenAudioSource.clip = _clip;
     }
 
     // Update is called once per frame
@@ -114,7 +122,6 @@ public class Aquarium : MonoBehaviour
         _totalHits++;
         if (_totalHits > _currentLife)
         {
-            Debug.Log("BROKEN!");
             BreakAquarium();
             return;
         }
@@ -149,6 +156,8 @@ public class Aquarium : MonoBehaviour
         // Empty watter
         RemoveWater();
         isBroken = true;
+
+        _brokenAudioSource.PlayOneShot(_clip);
     }
 
     private void RemoveWater()
@@ -234,7 +243,7 @@ public class Aquarium : MonoBehaviour
         HitPoint hitPoint = hit.GetComponentInChildren<HitPoint>();
         if (hitPoint != null)
         {
-            hitPoint.ReduceWatter(0, .48f);
+            hitPoint.ReduceWatter();
         }
         commandSent = true;
 
