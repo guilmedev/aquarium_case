@@ -47,6 +47,9 @@ public class Aquarium : MonoBehaviour
 
     [SerializeField]
     private GameObject _myhitPrefab;
+    [SerializeField]
+    private GameObject _glassPiecesPrefab;
+    private GameObject _glassPiecesContainer;
 
     [Space]
     [SerializeField]
@@ -84,11 +87,24 @@ public class Aquarium : MonoBehaviour
 
     private bool isBroken;
 
+    [Header("Physics Value")]
+    public float radius = 5.0F;
+    public float power = 10.0F;
+    public float upwardsModifier = 10.0F;
+
     [Header("Sound")]
     [SerializeField]
     private AudioSource _brokenAudioSource;
     [SerializeField]
     private AudioClip _clip;
+
+
+    [Header("hitPoint")]
+    [SerializeField]
+    private GameObject particleCollision;
+    [Header("Effects")]
+    [SerializeField]
+    private GameObject _watterSplashParcticle;
 
 
     // Start is called before the first frame update
@@ -138,7 +154,7 @@ public class Aquarium : MonoBehaviour
             //Where hitted ?
             if (HittedInsideWatter(currentHit))
             {
-                hitPoint.Init();
+                hitPoint.Init(particleCollision);
                 //TODO Coroutine Queue 
                 _currentTimeToBeEmpty -= _watterGravityModifier;
                 StartCoroutine(LerpTo(currentHit));
@@ -155,9 +171,33 @@ public class Aquarium : MonoBehaviour
         _glass.gameObject.SetActive(false);
         // Empty watter
         RemoveWater();
+
+       _glassPiecesContainer =  Instantiate(_glassPiecesPrefab, _glass.gameObject.transform.position, _glass.gameObject.transform.rotation);
+        _watterSplashParcticle.SetActive(true);
+        ApplyPhysycs();
+
         isBroken = true;
 
         _brokenAudioSource.PlayOneShot(_clip);
+    }
+
+    private void ApplyPhysycs()
+    {
+        Vector3 explosionPos = target.position;
+        Collider[] colliders = Physics.OverlapSphere(explosionPos, radius);
+        foreach (Collider hit in colliders)
+        {
+            Rigidbody rb = hit.GetComponent<Rigidbody>();
+
+            if (rb != null)
+                rb.AddExplosionForce(power, explosionPos, radius, upwardsModifier);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(target.position, radius);
+        Gizmos.color = Color.red;
     }
 
     private void RemoveWater()
@@ -192,6 +232,8 @@ public class Aquarium : MonoBehaviour
         DisableAllHits();
         // disable particles
         _glass.gameObject.SetActive(true);
+        _watterSplashParcticle.SetActive(false);
+
 
         isBroken = false;
     }
@@ -202,6 +244,8 @@ public class Aquarium : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        Destroy(_glassPiecesContainer);
 
         hits.Clear();
     }

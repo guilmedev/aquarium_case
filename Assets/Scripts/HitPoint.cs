@@ -33,9 +33,10 @@ public class HitPoint : MonoBehaviour
         _impactClip.volume = Random.Range(.5f, .8f);
     }
 
-    internal void Init()
+    internal void Init(GameObject collisinObject)
     {
         _particleSystem.gameObject.SetActive(true);
+        _particleSystem.collision.AddPlane(collisinObject.transform);
 
         RandomizeValues();
 
