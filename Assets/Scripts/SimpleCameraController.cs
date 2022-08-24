@@ -165,6 +165,14 @@ namespace UnityTemplateProjects
 
         void Update()
         {
+            // Hide and lock cursor when right mouse button pressed
+            if (IsLeftMouseButtonDown())
+            {
+                ShotRay();
+            }
+
+            return;
+
             // Exit Sample  
 
             //             if (IsEscapePressed())
@@ -180,13 +188,6 @@ namespace UnityTemplateProjects
             {
                 Cursor.lockState = CursorLockMode.Locked;
             }
-
-            // Hide and lock cursor when right mouse button pressed
-            if (IsLeftMouseButtonDown())
-            {
-                ShotRay();
-            }
-
 
             // Unlock and show cursor when right mouse button released
             if (IsRightMouseButtonUp())
