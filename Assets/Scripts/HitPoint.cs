@@ -10,7 +10,7 @@ public class HitPoint : MonoBehaviour
     [SerializeField]
     [Range(.1f, 2f)]
     private float _maxSize;
-    [SerializeField] 
+    [SerializeField]
     [Range(.1f, 2f)]
     private float _minSize;
     [Header("Particle")]
@@ -26,7 +26,7 @@ public class HitPoint : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
     private void Awake()
     {
@@ -44,6 +44,11 @@ public class HitPoint : MonoBehaviour
         _watterClip.Play();
     }
 
+    private bool IsParticleSystemActive()
+    {
+        return _particleSystem.gameObject.activeSelf;
+    }
+
     private void RandomizeValues()
     {
         _glassTexture.transform.localRotation = Quaternion.Euler(0f, 0f, Random.Range(-90f, 90f));
@@ -58,6 +63,8 @@ public class HitPoint : MonoBehaviour
 
     public void ReduceWatter()
     {
+        if (!IsParticleSystemActive()) return;
+        
         StartCoroutine(LerpValuesToZero(.48f));
     }
 

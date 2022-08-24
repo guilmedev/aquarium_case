@@ -21,15 +21,14 @@ TODO
 */
 
 
-
+[RequireComponent(typeof(HitsHandler))]
 public class Aquarium : MonoBehaviour
 {
-
     [SerializeField]
     private int _life = 2;
     private int _currentLife;
-
     private int _totalHits = 0;
+
     [Tooltip("Drecease amount for every new hit")]
     [SerializeField]
     private float _watterGravityModifier = .01f;
@@ -37,14 +36,11 @@ public class Aquarium : MonoBehaviour
     [SerializeField]
     private float _removeWatterTime = .45f;
 
-
     [Tooltip("Defatult value to water reaches the hit point")]
     [SerializeField]
     private float _timeToBeEmpty = 5f;
-    private float _currentTimeToBeEmpty;
 
     [Header("References")]
-
     [SerializeField]
     private GameObject _myhitPrefab;
     [SerializeField]
@@ -58,7 +54,6 @@ public class Aquarium : MonoBehaviour
     [SerializeField]
     private GameObject _watter;
 
-    private List<GameObject> hits = new List<GameObject>();
     [SerializeField]
     private float HIT_POS_OFFSET = .03f; // to help lerp stops in the middle of the role
 
@@ -106,6 +101,12 @@ public class Aquarium : MonoBehaviour
     [SerializeField]
     private GameObject _watterSplashParcticle;
 
+    private HitsHandler _hitsHanlder;
+
+    private void Awake()
+    {
+        _hitsHanlder = GetComponent<HitsHandler>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -115,9 +116,11 @@ public class Aquarium : MonoBehaviour
 
         isBroken = false;
         _currentLife = _life;
-        _currentTimeToBeEmpty = _timeToBeEmpty;
+        _hitsHanlder.currentTimeToBeEmpty = _timeToBeEmpty;
 
         _brokenAudioSource.clip = _clip;
+
+        _hitsHanlder.Init(target.gameObject, HIT_POS_OFFSET);
     }
 
     // Update is called once per frame
@@ -143,22 +146,27 @@ public class Aquarium : MonoBehaviour
         }
 
         GameObject currentHit = Instantiate(_myhitPrefab, hit.point, Quaternion.LookRotation(hit.normal));
-
-        //Maybe add as HitPoint ?
-        hits.Add(currentHit);
         currentHit.transform.SetParent(this.transform);
+
+        _hitsHanlder.AddNewPoint(currentHit);
+
 
         var hitPoint = currentHit.GetComponent<HitPoint>();
         if (hitPoint != null)
         {
+
             //Where hitted ?
             if (HittedInsideWatter(currentHit))
             {
                 hitPoint.Init(particleCollision);
                 //TODO Coroutine Queue 
-                _currentTimeToBeEmpty -= _watterGravityModifier;
-                StartCoroutine(LerpTo(currentHit));
+                _hitsHanlder.LerpToPoint(currentHit);
+                _hitsHanlder.currentTimeToBeEmpty -= _watterGravityModifier;
             }
+        }
+        else
+        {
+            Destroy(currentHit);
         }
     }
 
@@ -172,7 +180,7 @@ public class Aquarium : MonoBehaviour
         // Empty watter
         RemoveWater();
 
-       _glassPiecesContainer =  Instantiate(_glassPiecesPrefab, _glass.gameObject.transform.position, _glass.gameObject.transform.rotation);
+        _glassPiecesContainer = Instantiate(_glassPiecesPrefab, _glass.gameObject.transform.position, _glass.gameObject.transform.rotation);
         _watterSplashParcticle.SetActive(true);
         ApplyPhysycs();
 
@@ -202,10 +210,8 @@ public class Aquarium : MonoBehaviour
 
     private void RemoveWater()
     {
-        _currentTimeToBeEmpty = _removeWatterTime;
-        StartCoroutine(LerpTo(bottomlimit.gameObject));
-        //target.transform.position = new Vector3(target.transform.position.x, bottomlimit.position.y, target.transform.position.z);
-
+        _hitsHanlder.currentTimeToBeEmpty = _removeWatterTime;
+        _hitsHanlder.RemoveWater(bottomlimit.gameObject);
     }
 
     private void RestoreWater()
@@ -226,7 +232,7 @@ public class Aquarium : MonoBehaviour
         // reset time ?
         _totalHits = 0;
         _currentLife = _life;
-        _currentTimeToBeEmpty = _timeToBeEmpty;
+        _hitsHanlder.currentTimeToBeEmpty = _timeToBeEmpty;
 
         // disable all hits
         DisableAllHits();
@@ -240,56 +246,8 @@ public class Aquarium : MonoBehaviour
 
     private void DisableAllHits()
     {
-        foreach (GameObject gameObject in hits)
-        {
-            Destroy(gameObject);
-        }
+        _hitsHanlder.DisableAllHits();
 
         Destroy(_glassPiecesContainer);
-
-        hits.Clear();
-    }
-
-    IEnumerator LerpTo(GameObject hitPoint)
-    {
-        float timeElapsed = 0;
-        float lerpValue = 0;
-        float startValue = target.transform.position.y;
-        float endValue = (hitPoint.transform.position.y) + HIT_POS_OFFSET;
-
-        commandSent = false;
-
-        while (timeElapsed < _currentTimeToBeEmpty)
-        {
-            lerpValue = Mathf.Lerp(startValue, endValue, timeElapsed / _currentTimeToBeEmpty);
-
-            target.transform.position = new Vector3(target.transform.position.x, lerpValue, target.transform.position.z);
-
-            timeElapsed += Time.deltaTime;
-
-            lerping = true;
-
-            if (_currentTimeToBeEmpty - timeElapsed < .8)
-            {
-                ReduceWatter(hitPoint);
-            }
-
-            yield return null;
-        }
-        lerping = false;
-        target.transform.position = new Vector3(target.transform.position.x, endValue, target.transform.position.z);
-    }
-
-    private void ReduceWatter(GameObject hit)
-    {
-        if (commandSent || isBroken) return;
-
-        HitPoint hitPoint = hit.GetComponentInChildren<HitPoint>();
-        if (hitPoint != null)
-        {
-            hitPoint.ReduceWatter();
-        }
-        commandSent = true;
-
     }
 }
