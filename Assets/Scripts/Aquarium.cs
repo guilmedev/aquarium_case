@@ -100,13 +100,38 @@ public class Aquarium : MonoBehaviour
     private GameObject particleCollision;
     [Header("Effects")]
     [SerializeField]
-    private GameObject _watterSplashParcticle;
+    private GameObject _watterDropsSplashParcticle;
+    [SerializeField]
+    private ParticleSystem _watterSplashParcticle;
 
     private HitsHandler _hitsHanlder;
+
+
+
+    Transform a, b, c;
+    private float waterPercentResult;
+    public float WaterPercent => waterPercentResult;
+    float defaultEmissionCount;
+
+    public float WaterPercentValue
+    {
+        //float percentDistAlong = Vector3.Distance(a,c)/Vector3.Distance(a,b);
+        get
+        {
+            float waterPercetage = Vector3.Distance(a.position, c.position) / Vector3.Distance(a.position, b.position);
+
+            return waterPercentResult = Mathf.Round((waterPercetage * 100));
+        }
+    }
 
     private void Awake()
     {
         _hitsHanlder = GetComponent<HitsHandler>();
+
+        // Percentage variables
+        a = bottomlimit.transform;
+        b = topLimit.transform;
+        c = target.transform;
     }
 
     // Start is called before the first frame update
@@ -122,6 +147,14 @@ public class Aquarium : MonoBehaviour
         _brokenAudioSource.clip = _clip;
 
         _hitsHanlder.Init(target.gameObject, HIT_POS_OFFSET);
+
+        defaultEmissionCount = SaveDefaultParticleEmissionValue(_watterSplashParcticle);
+    }
+
+    private float SaveDefaultParticleEmissionValue(ParticleSystem particle)
+    {
+        ParticleSystem.EmissionModule emissionModule = particle.emission;
+        return emissionModule.GetBurst(0).count.constant;
     }
 
     // Update is called once per frame
@@ -200,12 +233,21 @@ public class Aquarium : MonoBehaviour
         RemoveWater();
 
         _glassPiecesContainer = Instantiate(_glassPiecesPrefab, _glass.gameObject.transform.position, _glass.gameObject.transform.rotation);
-        _watterSplashParcticle.SetActive(true);
+        _watterDropsSplashParcticle.SetActive(true);
+        UpdateEmissionBursts(_watterSplashParcticle, WaterPercentValue);
+
         ApplyPhysycs();
 
         isBroken = true;
 
         _brokenAudioSource.PlayOneShot(_clip);
+    }
+
+    private void UpdateEmissionBursts(ParticleSystem particle, float amount)
+    {
+        ParticleSystem.EmissionModule emissionModule = particle.emission;
+        float percentValue = (amount / 100) * defaultEmissionCount;
+        emissionModule.SetBurst(0,  new ParticleSystem.Burst(0, percentValue));
     }
 
     private void ApplyPhysycs()
@@ -225,6 +267,11 @@ public class Aquarium : MonoBehaviour
     {
         Gizmos.DrawWireSphere(target.position, radius);
         Gizmos.color = Color.red;
+
+    }
+    void OnGUI()
+    {
+        GUI.Label(new Rect(10, 10, 500, 20), "Water percentage: " + WaterPercent + " %");
     }
 
     private void RemoveWater()
@@ -257,10 +304,17 @@ public class Aquarium : MonoBehaviour
         DisableAllHits();
         // disable particles
         _glass.gameObject.SetActive(true);
-        _watterSplashParcticle.SetActive(false);
+        _watterDropsSplashParcticle.SetActive(false);
 
+        ResetParticleEmissionModuleValue(_watterSplashParcticle, defaultEmissionCount);
 
         isBroken = false;
+    }
+
+    private void ResetParticleEmissionModuleValue(ParticleSystem particle, float value)
+    {
+        ParticleSystem.EmissionModule emissionModule = particle.emission;
+        emissionModule.SetBurst(0, new ParticleSystem.Burst(0, value));
     }
 
     private void DisableAllHits()
