@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class HitPoint : MonoBehaviour
@@ -23,6 +22,11 @@ public class HitPoint : MonoBehaviour
     [SerializeField]
     private AudioSource _impactClip;
 
+    private Transform waterPosition = null;
+    private float hitOffset;
+    private float timeToBeEmptyMultiplayer;
+    private bool reducedWater;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -33,8 +37,10 @@ public class HitPoint : MonoBehaviour
         _impactClip.volume = Random.Range(.5f, .8f);
     }
 
-    internal void Init(GameObject collisinObject)
+    internal void Init(GameObject collisinObject, Transform waterPos, float hIT_POS_OFFSET)
     {
+        this.waterPosition = waterPos;
+        this.hitOffset = hIT_POS_OFFSET;
         _particleSystem.gameObject.SetActive(true);
         _particleSystem.collision.AddPlane(collisinObject.transform);
 
@@ -42,6 +48,22 @@ public class HitPoint : MonoBehaviour
 
         _watterClip.volume = _watterClip.volume;
         _watterClip.Play();
+    }
+
+    private void Update()
+    {
+        //Chegar pela distance se estou acima da água
+        if (waterPosition == null || reducedWater) return;
+
+        if ((waterPosition.transform.position.y - this.transform.position.y) < hitOffset)
+        {
+            reducedWater = true;
+            ReduceWatter();
+        }
+        else
+        {
+            _particleSystem.gameObject.SetActive(true);
+        }
     }
 
     private bool IsParticleSystemActive()
@@ -61,11 +83,11 @@ public class HitPoint : MonoBehaviour
             );
     }
 
-    public void ReduceWatter()
+    private void ReduceWatter()
     {
         if (!IsParticleSystemActive()) return;
-        
-        StartCoroutine(LerpValuesToZero(.48f));
+
+        StartCoroutine(LerpValuesToZero(.48f * timeToBeEmptyMultiplayer));
     }
 
     private IEnumerator LerpValuesToZero(float durartion)

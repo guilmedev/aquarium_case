@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -29,11 +30,11 @@ public class Aquarium : MonoBehaviour
     private int _currentLife;
     private int _totalHits = 0;
 
+    [SerializeField]
     [Tooltip("Drecease amount for every new hit")]
-    [SerializeField]
     private float _watterGravityModifier = .01f;
-    [Tooltip("Time to remove all water when aquarium is broken")]
     [SerializeField]
+    [Tooltip("Time to remove all water when aquarium is broken")]
     private float _removeWatterTime = .45f;
 
     [Tooltip("Defatult value to water reaches the hit point")]
@@ -148,25 +149,43 @@ public class Aquarium : MonoBehaviour
         GameObject currentHit = Instantiate(_myhitPrefab, hit.point, Quaternion.LookRotation(hit.normal));
         currentHit.transform.SetParent(this.transform);
 
-        _hitsHanlder.AddNewPoint(currentHit);
-
+        _hitsHanlder.AddNewHitPoint(currentHit);
 
         var hitPoint = currentHit.GetComponent<HitPoint>();
         if (hitPoint != null)
         {
 
-            //Where hitted ?
-            if (HittedInsideWatter(currentHit))
+            hitPoint.Init(particleCollision, target, HIT_POS_OFFSET);
+
+            // Water cannot go up
+            if (IsAvalidHitToLerpTo(currentHit))
             {
-                hitPoint.Init(particleCollision);
-                //TODO Coroutine Queue 
+                //Coroutine Queue
                 _hitsHanlder.LerpToPoint(currentHit);
                 _hitsHanlder.currentTimeToBeEmpty -= _watterGravityModifier;
             }
+
         }
         else
         {
             Destroy(currentHit);
+        }
+    }
+
+    private bool IsAvalidHitToLerpTo(GameObject currentHit)
+    {
+        if (_hitsHanlder.Hits.Count == 1) return true;
+
+
+        var lastHit = _hitsHanlder.Hits[(_hitsHanlder.Hits.Count - 2)];
+
+        if (lastHit != null)
+        {
+            return currentHit.transform.position.y < lastHit.transform.position.y;
+        }
+        else
+        {
+            return true;
         }
     }
 

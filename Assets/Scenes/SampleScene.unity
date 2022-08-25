@@ -5998,7 +5998,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 931834669}
-  m_LocalRotation: {x: -0.022157986, y: 0.97752726, z: -0.13516276, w: -0.16025153}
+  m_LocalRotation: {x: -0.02215799, y: 0.97752726, z: -0.13516276, w: -0.16025154}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -8259,8 +8259,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2140933099}
-  m_LocalRotation: {x: -0.012915137, y: 0.98367774, z: -0.07878175, w: -0.16125984}
-  m_LocalPosition: {x: 0, y: 0, z: 0.00000023841858}
+  m_LocalRotation: {x: -0.012915133, y: 0.98367774, z: -0.07878175, w: -0.16125982}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 982861210}
@@ -14245,14 +14245,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _life: 2
-  _watterGravityModifier: 0.8
+  _watterGravityModifier: 0.2
   _removeWatterTime: 0.18
   _timeToBeEmpty: 3
   _myhitPrefab: {fileID: 1456982000009624361, guid: 42201a7720ce789498cc68e93eb14ae3, type: 3}
   _glassPiecesPrefab: {fileID: 5775581414402201545, guid: 488675f34b54bc940aca2506e2042682, type: 3}
   _glass: {fileID: 8261896950311390004}
   _watter: {fileID: 7942378073205816435}
-  HIT_POS_OFFSET: 0.0235
+  HIT_POS_OFFSET: 0.025
   topLimit: {fileID: 1065178930}
   bottomlimit: {fileID: 1752648995}
   target: {fileID: 1378009624}

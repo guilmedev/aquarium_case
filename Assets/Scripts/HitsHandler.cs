@@ -4,16 +4,20 @@ using UnityEngine;
 
 public class HitsHandler : MonoBehaviour
 {
-    private float hitPosOffset = .03f; // to help lerp stops in the middle of the role
+    private float hitPosOffset; // to help lerp stops in the middle of the role
     [SerializeField]
     private float moveVelocity = .2f; // to help lerp stops in the middle of the role
 
     [SerializeField]
     private List<GameObject> hits = new List<GameObject>();
 
+    public List<GameObject> Hits => hits;
+
     private GameObject moveble = null;
 
-    IEnumerator runningCoroutine = null;
+    private IEnumerator runningCoroutine = null;
+    private Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
+    public float currentTimeToBeEmpty;
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +32,7 @@ public class HitsHandler : MonoBehaviour
         StartCoroutine(CoroutineCoordinator());
     }
 
-    public void AddNewPoint(GameObject newHit)
+    public void AddNewHitPoint(GameObject newHit)
     {
         hits.Add(newHit);
     }
@@ -80,12 +84,6 @@ public class HitsHandler : MonoBehaviour
 
 
     #region Coroutine
-    [SerializeField]
-    private Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
-    [HideInInspector]
-    public float currentTimeToBeEmpty;
-    private bool commandSent;
-
     IEnumerator CoroutineCoordinator()
     {
         while (true)
@@ -103,8 +101,6 @@ public class HitsHandler : MonoBehaviour
         float startValue = moveble.transform.position.y;
         float endValue = (hitPoint.transform.position.y) + hitPosOffset;
 
-        commandSent = false;
-
         while (timeElapsed < currentTimeToBeEmpty)
         {
             lerpValue = Mathf.Lerp(startValue, endValue, timeElapsed / currentTimeToBeEmpty);
@@ -112,31 +108,10 @@ public class HitsHandler : MonoBehaviour
             moveble.transform.position = new Vector3(moveble.transform.position.x, lerpValue, moveble.transform.position.z);
 
             timeElapsed += Time.deltaTime;
-
-
-            if (currentTimeToBeEmpty - timeElapsed < .8)
-            {
-                ReduceWatter(hitPoint);
-            }
-
             yield return null;
         }
 
         moveble.transform.position = new Vector3(moveble.transform.position.x, endValue, moveble.transform.position.z);
-    }
-
-
-    private void ReduceWatter(GameObject hit)
-    {
-        if (commandSent) return;
-
-        HitPoint hitPoint = hit.GetComponentInChildren<HitPoint>();
-        if (hitPoint != null)
-        {
-            hitPoint.ReduceWatter();
-        }
-
-        commandSent = true;
     }
 
     #endregion
