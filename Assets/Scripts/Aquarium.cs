@@ -247,7 +247,7 @@ public class Aquarium : MonoBehaviour
     {
         ParticleSystem.EmissionModule emissionModule = particle.emission;
         float percentValue = (amount / 100) * defaultEmissionCount;
-        emissionModule.SetBurst(0,  new ParticleSystem.Burst(0, percentValue));
+        emissionModule.SetBurst(0, new ParticleSystem.Burst(0, percentValue));
     }
 
     private void ApplyPhysycs()
@@ -269,11 +269,6 @@ public class Aquarium : MonoBehaviour
         Gizmos.color = Color.red;
 
     }
-    void OnGUI()
-    {
-        GUI.Label(new Rect(10, 10, 500, 20), "Water percentage: " + WaterPercent + " %");
-    }
-
     private void RemoveWater()
     {
         _hitsHanlder.currentTimeToBeEmpty = _removeWatterTime;
@@ -292,10 +287,6 @@ public class Aquarium : MonoBehaviour
 
     public void ResetAquarium()
     {
-        //restore watter
-        RestoreWater();
-
-        // reset time ?
         _totalHits = 0;
         _currentLife = _life;
         _hitsHanlder.currentTimeToBeEmpty = _timeToBeEmpty;
@@ -307,6 +298,9 @@ public class Aquarium : MonoBehaviour
         _watterDropsSplashParcticle.SetActive(false);
 
         ResetParticleEmissionModuleValue(_watterSplashParcticle, defaultEmissionCount);
+
+        //restore watter
+        RestoreWater();
 
         isBroken = false;
     }
