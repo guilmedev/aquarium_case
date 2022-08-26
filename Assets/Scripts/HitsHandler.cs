@@ -19,8 +19,6 @@ public class HitsHandler : MonoBehaviour
     private Queue<IEnumerator> coroutineQueue = new Queue<IEnumerator>();
     public float currentTimeToBeEmpty;
 
-    private bool forceStop;
-
     // Start is called before the first frame update
     void Start()
     {
@@ -37,7 +35,6 @@ public class HitsHandler : MonoBehaviour
     public void AddNewHitPoint(GameObject newHit)
     {
         hits.Add(newHit);
-        forceStop = false;
     }
 
     public void LerpToPoint(GameObject newHit)
@@ -77,9 +74,6 @@ public class HitsHandler : MonoBehaviour
 
         hits.Clear();
 
-        // Stops the Routine Queue
-        forceStop = true;
-
         coroutineQueue.Clear();
         runningCoroutine = null;
         if (runningCoroutine != null)
@@ -109,9 +103,7 @@ public class HitsHandler : MonoBehaviour
         float endValue = (hitPoint.transform.position.y) + hitPosOffset;
 
         while (timeElapsed < currentTimeToBeEmpty)
-        {
-            if (forceStop) yield break;
-                
+        {              
             lerpValue = Mathf.Lerp(startValue, endValue, timeElapsed / currentTimeToBeEmpty);
 
             moveble.transform.position = new Vector3(moveble.transform.position.x, lerpValue, moveble.transform.position.z);

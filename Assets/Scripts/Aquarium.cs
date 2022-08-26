@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 /*
@@ -24,7 +21,7 @@ TODO
 
 [RequireComponent(typeof(HitsHandler))]
 public class Aquarium : MonoBehaviour
-{
+{   
     [SerializeField]
     private int _life = 2;
     private int _currentLife;
@@ -103,7 +100,6 @@ public class Aquarium : MonoBehaviour
     private GameObject _watterDropsSplashParcticle;
     [SerializeField]
     private ParticleSystem _watterSplashParcticle;
-
     private HitsHandler _hitsHanlder;
 
 
@@ -112,6 +108,11 @@ public class Aquarium : MonoBehaviour
     private float waterPercentResult;
     public float WaterPercent => waterPercentResult;
     float defaultEmissionCount;
+
+    [Header("Events")]
+    
+    public UnityEvent OnBreak;
+    public UnityEvent OnRestore;
 
     public float WaterPercentValue
     {
@@ -241,6 +242,8 @@ public class Aquarium : MonoBehaviour
         isBroken = true;
 
         _brokenAudioSource.PlayOneShot(_clip);
+
+        OnBreak?.Invoke();
     }
 
     private void UpdateEmissionBursts(ParticleSystem particle, float amount)
@@ -303,6 +306,8 @@ public class Aquarium : MonoBehaviour
         RestoreWater();
 
         isBroken = false;
+
+        OnRestore?.Invoke();
     }
 
     private void ResetParticleEmissionModuleValue(ParticleSystem particle, float value)
