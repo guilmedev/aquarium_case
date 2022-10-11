@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Seaweed_MAT
+  m_Shader: {fileID: -6465566751694194690, guid: 29878864a3122df4c85950174d6187df, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Vector1_84f42a3b02274a6ba308968b88503d61: 0.08
+    - Vector1_8c7ccc1379424aa296cc47638da232f8: 0.016
+    - Vector1_a47d699c55484d8aab8254808c327574: 0.23
+    - Vector1_bc934d06091f414eb437c5f6e93adad8: 0.259
+    - Vector1_d7cc6ece50df4ccf9d419375dd68df11: 0.76
+    - Vector1_f486ea63f2c549869f68b7e0080636f1: 0
+    m_Colors:
+    - Color_c49a76bf566b49d3b8b6eefc6e9fdc27: {r: 0.16470584, g: 0.4823529, b: 0, a: 1}
+    - Vector2_8388ff30ddd842d08556af761e1ec08d: {r: 0.1, g: 0, b: 0, a: 0}
+    - Vector3_114460605d414ac5b7dd1a94e12f9f77: {r: 1.03, g: 1.46, b: 1.29, a: 0}
+  m_BuildTextureStacks: []
